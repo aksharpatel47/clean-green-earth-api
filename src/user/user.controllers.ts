@@ -1,5 +1,10 @@
 import { Request, Response } from 'express';
-import { IUserRegistrationRequest, IUserDetailRequest } from "./user.model";
+import {
+  IUserRegistrationRequest,
+  IUserDetailRequest,
+  IUpdateUserDetailsRequest,
+  IVerifyUserEmailRequest
+} from "./user.model";
 
 /**
  * Registers user in the system.
@@ -7,6 +12,16 @@ import { IUserRegistrationRequest, IUserDetailRequest } from "./user.model";
  * as response upon successful registration.
  */
 export function registerUser(req: IUserRegistrationRequest, res: Response) {
+
+}
+
+/**
+ * Verifies the email of the User.
+ * Once the user is registered, the system sends a code to the email
+ * that was used when registering. When the user enters this code,
+ * the email is verified.
+ */
+export function verifyEmail(req: IVerifyUserEmailRequest, res: Response) {
 
 }
 
@@ -24,6 +39,6 @@ export function getUserDetail(req: IUserDetailRequest, res: Response) {
  * This route can be used to change the name or password
  * of the User.
  */
-export function updateUserDetail(req: Request, res: Response) {
-
+export function updateUserDetail(req: IUpdateUserDetailsRequest, res: Response) {
+  
 }

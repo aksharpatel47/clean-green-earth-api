@@ -1,10 +1,11 @@
 import { Router } from 'express';
-import { registerUser, getUserDetail, updateUserDetail } from "./user.controllers";
+import { registerUser, getUserDetail, updateUserDetail, verifyEmail } from "./user.controllers";
 
 const UserRoutes = Router();
 
 UserRoutes
   .post('/', registerUser)
+  .put('/:email', verifyEmail)
   .patch('/', updateUserDetail)
   .get('/:id', getUserDetail);
 
