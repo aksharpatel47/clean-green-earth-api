@@ -4,7 +4,8 @@
     "target": "es6",
     "sourceMap": true,
     "sourceRoot": "src",
-    "outDir": "build"
+    "outDir": "build",
+    "strictNullChecks": true
   },
   "exclude": [
     "node_modules"
