@@ -12,9 +12,10 @@
   "dependencies": {
     "body-parser": "1.15.2",
     "express": "4.14.0",
+    "firebase-admin": "^4.0.2",
     "joi": "^9.2.0",
     "jsonwebtoken": "7.1.9",
-    "pg-promise": "5.3.5"
+    "pg-promise": "5.4.3"
   },
   "devDependencies": {
     "@types/body-parser": "0.0.33",
