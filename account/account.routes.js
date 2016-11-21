@@ -4,6 +4,8 @@ const controllers = require('./account.controllers');
 const accountRoutes = Router();
 
 accountRoutes
-  .post('/', controllers.createAccount);
+  .post('/', controllers.createAccount)
+  .patch('/', controllers.updateAccount)
+  .get('/', controllers.getAccountDetails);
 
 module.exports = accountRoutes;
