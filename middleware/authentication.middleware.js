@@ -1,10 +1,15 @@
 const firebaseAdmin = require('../firebase-admin');
 
 module.exports = function authenticationMiddleware(req, res, next) {
-  let authenticationToken = req.get('Authentication');
+  let authenticationToken = req.get('Authorization');
+
+  if (!authenticationToken) {
+    return res.sendStatus(401);
+  }
+
   let tokenComponents = authenticationToken.split(' ');
   
-  if (!authenticationToken || tokenComponents.length != 2) {
+  if (tokenComponents.length != 2) {
     return res.sendStatus(401);
   }
   
