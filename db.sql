@@ -16,7 +16,8 @@ create table if not exists events (
 
 create table if not exists attendance (
   event_id varchar(50) not null references events(id),
-  user_id varchar(50) not null references users(uid)
+  user_id varchar(50) not null references users(uid),
+  primary key (event_id, user_id)
 );
 
 create extension cube;
