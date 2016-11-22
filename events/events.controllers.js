@@ -4,7 +4,7 @@ const uuid = require('uuid');
 exports.getEventDetails = function getEventDetails(req, res) {
   const eventId = req.params.id;
 
-  const query = `select e.id, e.title, e.description, e.location, e.date, e.start_time as "startTime", e.end_time as "endTime", , json_agg(u) as users from events e 
+  const query = `select e.id, e.title, e.description, e.location, e.date, e.start_time as "startTime", e.end_time as "endTime", e.user_id as "userId" , json_agg(u) as users from events e 
   left join attendance a on a.event_id = e.id 
   left join users u on u.uid = a.user_id 
   group by e.id 
