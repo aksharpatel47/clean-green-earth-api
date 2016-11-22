@@ -4,7 +4,12 @@ const uuid = require('uuid');
 exports.getEventDetails = function getEventDetails(req, res) {
   const eventId = req.params.id;
 
-  const query = `select * from events where id = $1`;
+  const query = `select e.id, e.title, e.description, e.location, e.date, e.start_time as "startTime", e.end_time as "endTime", , json_agg(u) as users from events e 
+  left join attendance a on a.event_id = e.id 
+  left join users u on u.uid = a.user_id 
+  group by e.id 
+  having e.id = $1;`;
+
   const values = [eventId];
 
   db.one(query, values)
