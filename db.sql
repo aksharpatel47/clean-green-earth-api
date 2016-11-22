@@ -14,7 +14,7 @@ create table if not exists events (
   user_id varchar(50) not null references users(uid)
 );
 
-create table if not exists attending (
+create table if not exists attendance (
   event_id varchar(50) not null references events(id),
   user_id varchar(50) not null references users(uid)
 );
