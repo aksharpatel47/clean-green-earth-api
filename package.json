@@ -15,7 +15,8 @@
     "firebase-admin": "^4.0.2",
     "joi": "^9.2.0",
     "jsonwebtoken": "7.1.9",
-    "pg-promise": "5.4.3"
+    "pg-promise": "5.4.3",
+    "uuid": "^3.0.0"
   },
   "devDependencies": {
     "@types/body-parser": "0.0.33",
