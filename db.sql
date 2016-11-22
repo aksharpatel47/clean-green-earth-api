@@ -18,3 +18,6 @@ create table if not exists attending (
   event_id varchar(50) not null references events(id),
   user_id varchar(50) not null references users(uid)
 );
+
+create extension cube;
+create extension earthdistance;
