@@ -8,6 +8,9 @@ create table if not exists events (
   title varchar(50) not null,
   description varchar(1000),
   location point not null,
+  date timestamp with time zone not null,
+  start_time time with time zone not null,
+  end_time time with time zone not null,
   user_id varchar(50) not null references users(uid)
 );
 
