@@ -31,7 +31,7 @@ exports.getAccountDetails = function getAccountDetails(req, res) {
   
   const query = 'select * from users where uid = $1';
   
-  db.one(query)
+  db.one(query, [uid])
     .then((data) => {
       res.json({data});
     }, (err) => {
