@@ -30,7 +30,7 @@ exports.getEvents = function getEvents(req, res) {
   where (($1::point <@> e.location)::numeric * 1.61) < $2`;
   const values = [`(${longitude},${latitude})`, radius]
 
-  db.many(query, values)
+  db.manyOrNone(query, values)
     .then((events) => {
       res.status(200).json({data: events});
     }, (err) => {
