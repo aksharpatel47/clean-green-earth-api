@@ -4,7 +4,7 @@ const uuid = require('uuid');
 exports.getEventDetails = function getEventDetails(req, res) {
   const eventId = req.params.id;
 
-  const query = `select e.id, e.title, e.description, e.location, e.date, e.start_time as "startTime", e.end_time as "endTime", 
+  const query = `select e.id, e.title, e.description, e.location, e.date, e.duration, 
   e.user_id as "userId", us.name as "userName"
   from events as e 
   left join users as us on e.user_id = us.uid
@@ -23,7 +23,7 @@ exports.getEventDetails = function getEventDetails(req, res) {
 exports.getEvents = function getEvents(req, res) {
   const { latitude, longitude, radius } = req.query;
 
-  const query = `select e.id, e.title, e.description, e.location, e.date, e.start_time as "startTime", e.end_time as "endTime",
+  const query = `select e.id, e.title, e.description, e.location, e.date, e.duration,
   e.user_id as "userId", u.name as "userName"
   from events as e
   left join users u on e.user_id = u.uid 
@@ -39,14 +39,14 @@ exports.getEvents = function getEvents(req, res) {
 }
 
 exports.createEvent = function createEvent(req, res) {
-  const { uid, title, description, location, date, startTime, endTime } = req.body;
+  const { uid, title, description, location, date, duration } = req.body;
   const { latitude, longitude } = location;
 
   const eventId = uuid.v4();
 
-  const query = `insert into events(id, title, description, location, date, start_time, end_time, user_id)
-  values($1, $2, $3, $4, $5, $6, $7, $8)`;
-  const values = [eventId, title, description, `(${longitude},${latitude})`, date, startTime, endTime, uid];
+  const query = `insert into events(id, title, description, location, date, duration, user_id)
+  values($1, $2, $3, $4, $5, $6, $7)`;
+  const values = [eventId, title, description, `(${longitude},${latitude})`, date, duration, uid];
 
   db.none(query, values)
     .then(() => {
@@ -58,13 +58,13 @@ exports.createEvent = function createEvent(req, res) {
 
 exports.updateEvent = function updateEvent(req, res) {
   const eventId = req.params.id;
-  const { uid, title, description, location, date, startTime, endTime } = req.body;
+  const { uid, title, description, location, date, duration } = req.body;
 
   const { latitude, longitude } = location;
 
-  const query = `update events set title = $1, description = $2, location = $3, date = $4, start_time = $5, 
-    end_time = $6 where id = $7 and user_id = $8`;
-  const values = [title, description, `(${longitude},${latitude})`, date, startTime, endTime, eventId, uid]
+  const query = `update events set title = $1, description = $2, location = $3, date = $4, duration = $5,
+  updated_on = $6 where id = $7 and user_id = $8`;
+  const values = [title, description, `(${longitude},${latitude})`, date, duration, new Date(), eventId, uid]
 
   db.none(query, values)
     .then(() => {
