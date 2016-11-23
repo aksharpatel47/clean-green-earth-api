@@ -1,6 +1,8 @@
 create table if not exists users (
   uid varchar(50) primary key not null,
   name varchar(50) not null default 'Anonymous'
+  created_on timestamp with time zone not null default now(),
+  updated_on timestamp with time zone not null default now()
 );
 
 create table if not exists events (
@@ -9,14 +11,17 @@ create table if not exists events (
   description varchar(1000),
   location point not null,
   date timestamp with time zone not null,
-  start_time time with time zone not null,
-  end_time time with time zone not null,
-  user_id varchar(50) not null references users(uid)
+  duration integer not null,
+  user_id varchar(50) not null references users(uid) on delete cascade on update cascade,
+  created_on timestamp with time zone not null default now(),
+  updated_on timestamp with time zone not null default now()
 );
 
 create table if not exists attendance (
-  event_id varchar(50) not null references events(id),
-  user_id varchar(50) not null references users(uid),
+  event_id varchar(50) not null references events(id) on delete cascade on update cascade,
+  user_id varchar(50) not null references users(uid) on delete cascade on update cascade,
+  created_on timestamp with time zone not null default now(),
+  updated_on timestamp with time zone not null default now()
   primary key (event_id, user_id)
 );
 
