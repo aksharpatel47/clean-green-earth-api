@@ -4,11 +4,11 @@ const uuid = require('uuid');
 exports.getEventDetails = function getEventDetails(req, res) {
   const eventId = req.params.id;
 
-  const query = `select e.id, e.title, e.description, e.location, e.date, e.start_time as "startTime", e.end_time as "endTime", e.user_id as "userId" , json_agg(u) as users from events e 
-  left join attendance a on a.event_id = e.id 
-  left join users u on u.uid = a.user_id 
-  group by e.id 
-  having e.id = $1;`;
+  const query = `select e.id, e.title, e.description, e.location, e.date, e.start_time as "startTime", e.end_time as "endTime", 
+  e.user_id as "userId", us.name as "userName"
+  from events as e 
+  left join users as us on e.user_id = us.uid
+  where e.id = $1;`;
 
   const values = [eventId];
 
@@ -23,7 +23,11 @@ exports.getEventDetails = function getEventDetails(req, res) {
 exports.getEvents = function getEvents(req, res) {
   const { latitude, longitude, radius } = req.query;
 
-  const query = `select * from events as ev where (($1::point <@> ev.location)::numeric * 1.61) < $2`;
+  const query = `select e.id, e.title, e.description, e.location, e.date, e.start_time as "startTime", e.end_time as "endTime",
+  e.user_id as "userId", u.name as "userName"
+  from events as e
+  left join users u on e.user_id = u.uid 
+  where (($1::point <@> e.location)::numeric * 1.61) < $2`;
   const values = [`(${longitude},${latitude})`, radius]
 
   db.many(query, values)
