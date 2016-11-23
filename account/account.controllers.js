@@ -29,7 +29,7 @@ exports.updateAccount = function updateAccount(req, res) {
 exports.getAccountDetails = function getAccountDetails(req, res) {
   const { uid } = req.body;
   
-  const query = 'select * from users where uid = $1';
+  const query = 'select u.uid as "userId", u.name as "userName" from users u where uid = $1';
   
   db.one(query, [uid])
     .then((data) => {
