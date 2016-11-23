@@ -16,9 +16,9 @@ exports.createAccount = function createAccount(req, res) {
 exports.updateAccount = function updateAccount(req, res) {
   const { uid, name } = req.body;
 
-  const query = 'update users set name = $1 where uid = $2';
+  const query = 'update users set name = $1, updated_on = $2 where uid = $3';
 
-  db.none(query, [name, uid])
+  db.none(query, [name, new Date(), uid])
     .then(() => {
       res.status(200).send({data: 'success'});
     }, (err) => {
