@@ -10,6 +10,7 @@ eventRoutes
   .post('/', controllers.createEvent)
   .put('/:id', controllers.updateEvent)
   .delete('/:id', controllers.deleteEvent)
+  .get('/:id/attendance', attControllers.getAttendees)
   .post('/:id/attendance', attControllers.attendEvent)
   .delete('/:id/attendance', attControllers.removeAttendanceFromEvent);
 
