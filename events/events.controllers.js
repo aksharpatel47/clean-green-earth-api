@@ -20,7 +20,7 @@ exports.getEventDetails = function getEventDetails(req, res) {
     });
 }
 
-exports.getEvents = function getEvents(req, res) {
+exports.searchEvents = function searchEvents(req, res) {
   const { latitude, longitude, radius } = req.query;
 
   const query = `select e.id, e.title, e.description, e.location, e.date, e.duration,
