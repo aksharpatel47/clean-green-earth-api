@@ -1,6 +1,6 @@
 const Router = require('express').Router;
 const controllers = require('./events.controllers');
-const attControllers = require('../attendance/attendance.controllers');
+const attRoutes = require('../attendance/attendance.routes');
 
 const eventRoutes = Router();
 
@@ -10,5 +10,7 @@ eventRoutes
   .post('/', controllers.createEvent)
   .put('/:id', controllers.updateEvent)
   .delete('/:id', controllers.deleteEvent);
+
+eventRoutes.use('/', attRoutes);
 
 module.exports = eventRoutes
