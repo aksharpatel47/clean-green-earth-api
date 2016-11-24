@@ -10,6 +10,7 @@ create table if not exists events (
   title varchar(50) not null,
   description varchar(1000),
   location point not null,
+  address varchar(300),
   date timestamp with time zone not null,
   duration integer not null,
   user_id varchar(50) not null references users(uid) on delete cascade on update cascade,

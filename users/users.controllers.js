@@ -42,7 +42,7 @@ exports.getUserDetails = function getUserDetails(req, res) {
 exports.getUserEvents = function getUserEvents(req, res) {
   const userId = req.params.id;
 
-  const query = `select e.id, e.title, e.description, e.location, e.date, e.duration,
+  const query = `select e.id, e.title, e.description, e.location, e.address, e.date, e.duration,
   e.user_id as "userId", u.name as "userName" from events e
   left join users u on e.user_id = u.uid where u.uid = $1`;
 
@@ -57,7 +57,7 @@ exports.getUserEvents = function getUserEvents(req, res) {
 exports.getEventsWithUserAttendance = function getEventsWithUserAttendance(req, res) {
   const userId = req.params.id;
 
-  const query = `select e.id, e.title, e.description, e.location, e.date, e.duration,
+  const query = `select e.id, e.title, e.description, e.location, e.address, e.date, e.duration,
   e.user_id as "userId", u.name as "userName" from events e
   left join users u on u.uid = e.user_id
   left join attendance a on a.event_id = e.id
