@@ -13,5 +13,6 @@ app.use('/', authenticationMiddleware);
 // Routes
 app.use('/account', accountRoutes);
 app.use('/events', eventRoutes);
+app.use('/events', require('./attendance/attendance.routes'));
 
 module.exports = app;

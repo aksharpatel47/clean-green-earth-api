@@ -4,7 +4,8 @@ const controllers = require('./attendance.controllers');
 const attendanceRoutes = Router();
 
 attendanceRoutes
-  .post('/', controllers.attendEvent)
-  .delete('/', controllers.removeAttendanceFromEvent);
+  .get('/:id/attendance', controllers.getAttendees)
+  .post('/:id/attendance', controllers.attendEvent)
+  .delete('/:id/attendance', controllers.removeAttendanceFromEvent);
 
 module.exports = attendanceRoutes;
