@@ -1,6 +1,6 @@
 const db = require('../db');
 
-exports.createAccount = function createAccount(req, res) {
+exports.createUser = function createUser(req, res) {
   const { uid } = req.body;
   
   const query = 'insert into users(uid) values ($1)';
@@ -13,7 +13,7 @@ exports.createAccount = function createAccount(req, res) {
     });
 };
 
-exports.updateAccount = function updateAccount(req, res) {
+exports.updateUserDetails = function updateUserDetails(req, res) {
   const { uid, name } = req.body;
 
   const query = 'update users set name = $1, updated_on = $2 where uid = $3';
@@ -26,7 +26,7 @@ exports.updateAccount = function updateAccount(req, res) {
     });
 };
 
-exports.getAccountDetails = function getAccountDetails(req, res) {
+exports.getUserDetails = function getUserDetails(req, res) {
   const { uid } = req.body;
   
   const query = 'select u.uid as "userId", u.name as "userName" from users u where uid = $1';

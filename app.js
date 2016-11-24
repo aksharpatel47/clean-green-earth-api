@@ -8,7 +8,7 @@ app.use(bodyParser.json());
 app.use(require('./middleware/authentication.middleware'));
 
 // Routes
-app.use('/account', require('./account/account.routes'));
+app.use('/users', require('./users/users.routes'));
 app.use('/events', require('./events/events.routes'));
 app.use('/events', require('./attendance/attendance.routes'));
 
