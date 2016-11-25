@@ -27,11 +27,11 @@ exports.updateUserDetails = function updateUserDetails(req, res) {
 };
 
 exports.getUserDetails = function getUserDetails(req, res) {
-  const { uid } = req.body;
+  const userId = req.params.id;
   
   const query = 'select u.uid as "userId", u.name as "userName" from users u where uid = $1';
   
-  db.one(query, [uid])
+  db.one(query, [userId])
     .then((data) => {
       res.json({data});
     }, (err) => {
