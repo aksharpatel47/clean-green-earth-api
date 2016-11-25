@@ -12,8 +12,12 @@ exports.getEventDetails = function getEventDetails(req, res) {
 
   const values = [eventId];
 
-  db.one(query, values)
+  db.oneOrNone(query, values)
     .then((eventData) => {
+      if (!eventData) {
+        return res.status(404).json({data: {message: 'No such event exists.'}});
+      }
+      
       res.status(200).json({data: eventData})
     }, (err) => {
       res.status(400).json({data: err});
