@@ -1,6 +1,9 @@
 const db = require('../db');
 const uuid = require('uuid');
 
+/**
+ * Get details of the event with id sent in the params.
+ */
 exports.getEventDetails = function getEventDetails(req, res) {
   const eventId = req.params.id;
 
@@ -24,6 +27,9 @@ exports.getEventDetails = function getEventDetails(req, res) {
     });
 }
 
+/**
+ * Search Events happening around a location within a particular radius.
+ */
 exports.searchEvents = function searchEvents(req, res) {
   const { latitude, longitude, radius } = req.query;
 
@@ -42,6 +48,9 @@ exports.searchEvents = function searchEvents(req, res) {
     })
 }
 
+/**
+ * Create Event and send the eventId back.
+ */
 exports.createEvent = function createEvent(req, res) {
   const { uid, title, description, location, address, date, duration } = req.body;
   const { latitude, longitude } = location;
@@ -60,6 +69,10 @@ exports.createEvent = function createEvent(req, res) {
     })
 }
 
+/**
+ * Update event details based on the id sent in the params. It
+ * updates all the details of the event apart from the duration.
+ */
 exports.updateEvent = function updateEvent(req, res) {
   const eventId = req.params.id;
   const { uid, title, description, location, address, date, duration } = req.body;
@@ -78,6 +91,9 @@ exports.updateEvent = function updateEvent(req, res) {
     });
 }
 
+/**
+ * Delete the event based on the id sent in the params.
+ */
 exports.deleteEvent = function deleteEvent(req, res) {
   const eventId = req.params.id;
   const { uid } = req.body;
