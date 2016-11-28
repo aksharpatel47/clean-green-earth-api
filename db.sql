@@ -1,6 +1,7 @@
 create table if not exists users (
   uid varchar(50) primary key not null,
   name varchar(50) not null default 'Anonymous',
+  image varchar(100),
   created_on timestamp with time zone not null default now(),
   updated_on timestamp with time zone not null default now()
 );
@@ -9,6 +10,7 @@ create table if not exists events (
   id varchar(50) primary key not null,
   title varchar(50) not null,
   description varchar(1000),
+  image varchar(100),
   location point not null,
   address varchar(300),
   date timestamp with time zone not null,
