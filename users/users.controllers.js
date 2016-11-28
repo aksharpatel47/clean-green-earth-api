@@ -16,9 +16,21 @@ exports.createUser = function createUser(req, res) {
 exports.updateUserDetails = function updateUserDetails(req, res) {
   const { uid, name } = req.body;
 
-  const query = 'update users set name = $1, updated_on = $2 where uid = $3';
+  let query;
+  let values = [];
 
-  db.none(query, [name, new Date(), uid])
+  if (req.file) {
+    let fileName = req.file.filename;
+    query = 'update users set image = $1, updated_on = $2 where uid = $3'
+    values.push(fileName);
+  } else if (name) {
+    query = 'update users set name = $1, updated_on = $2 where uid = $3';
+    values.push(name);
+  }
+
+  values.push(new Date(), uid);
+
+  db.none(query, values)
     .then(() => {
       res.status(200).send({data: 'success'});
     }, (err) => {
