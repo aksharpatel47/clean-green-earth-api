@@ -15,7 +15,7 @@ exports.userImageUpload = multer({ storage: userStorage, limits: { fileSize: '5M
 
 const eventStorage = multer.diskStorage({
   filename: (req, file, cb) => {
-    let eventId = uuid.v4();
+    let eventId = req.params.id || uuid.v4();
     req.body.eventId = eventId;
     cb(null, eventId + '-' + Date.now() + '.jpg');
   }

@@ -54,12 +54,16 @@ exports.searchEvents = function searchEvents(req, res) {
 exports.createEvent = function createEvent(req, res) {
   const { uid, title, description, location, address, date, duration } = req.body;
   const { latitude, longitude } = location;
-
+  let imageFileName;
   const eventId = uuid.v4();
 
-  const query = `insert into events(id, title, description, location, address, date, duration, user_id)
-  values($1, $2, $3, $4, $5, $6, $7, $8)`;
-  const values = [eventId, title, description, `(${longitude},${latitude})`, address, date, duration, uid];
+  if (req.file) {
+    imageFileName = req.file.filename;
+  }
+
+  const query = `insert into events(id, title, description, image, location, address, date, duration, user_id)
+  values($1, $2, $3, $4, $5, $6, $7, $8, $9)`;
+  const values = [eventId, title, description, imageFileName, `(${longitude},${latitude})`, address, date, duration, uid];
 
   db.none(query, values)
     .then(() => {
@@ -71,7 +75,7 @@ exports.createEvent = function createEvent(req, res) {
 
 /**
  * Update event details based on the id sent in the params. It
- * updates all the details of the event apart from the duration.
+ * updates all the details of the event apart from the image.
  */
 exports.updateEvent = function updateEvent(req, res) {
   const eventId = req.params.id;
@@ -89,6 +93,29 @@ exports.updateEvent = function updateEvent(req, res) {
     }, (err) => {
       res.status(400).json({data: err});
     });
+}
+
+/**
+ * Patch Event Details updtes the event with a new image.
+ * // TODO: Remove old image when new image is updated.
+ */
+exports.patchEventDetails = function patchEventDetails(req, res) {
+  const { uid, eventId } = req.body;
+
+  if (req.file) {
+    const newFileName = req.file.filename;
+    const query = 'update events set image = $1 where id = $2 and user_id = $3';
+    const values = [newFileName, eventId, uid];
+    //TODO: Remove the newly uploaded file if the event does not exist.
+    db.none(query, values)
+      .then(() => {
+        res.status(200).json({data: {message: 'success'}})
+      }, (err) => {
+        res.status(400).json({data: err});
+      })
+  } else {
+    return res.status(400).json({data: {message: 'No Event Image received.'}})
+  }
 }
 
 /**
