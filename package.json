@@ -15,6 +15,7 @@
     "firebase-admin": "^4.0.2",
     "joi": "^9.2.0",
     "jsonwebtoken": "7.1.9",
+    "multer": "^1.2.0",
     "pg-promise": "5.4.3",
     "uuid": "^3.0.0"
   },
