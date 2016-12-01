@@ -1,0 +1,173 @@
+swagger: '2.0'
+
+info:
+  version: 1.0.0
+  title: Clean Green Earth
+  description: API to identify places that need community help.
+  contact:
+    name: Akshar Patel
+    email: akshar@ekantik.tech
+host: api.cleangreenearth.org
+schemes:
+  - https
+basePath: /v1
+consumes:
+  - application/json
+  - multipart/form-data
+produces:
+  - application/json
+paths:
+  /users:
+    post:
+      summary: |
+        Create a new User. Since we are using Firebase for Authentication, the User would have already been
+        created in Firebase before we add the user to our own database.
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema: 
+            $ref: '#/definitions/NewUser'
+      tags:
+        - Users
+      responses:
+        200:
+          $ref: '#/responses/Success'
+        400:
+          description: Error while creating a new User.
+    patch:
+      summary:  |
+        Update the details of the user.
+      parameters:
+        - name: user-image
+          in: formData
+          description: A JPEG image that should replace the current image of the user.
+          required: false
+          type: file
+        - name: name
+          in: formData
+          description: Updated name of the user.
+          required: false
+          type: string
+      responses:
+        200:
+          $ref: '#/responses/Success'
+        400:
+          description: Error while updating User data.
+  /users/{userId}:
+    get:
+      summary: Get detailed information of a User.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: Id of the User whose details we require.
+          type: string
+      tags:
+        - Users
+      responses:
+        200:
+          description: Successfully retrieved information about the user.
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/definitions/User'
+        404:
+          description: Did not find any User with the given userId.
+        400:
+          description: Error while getting details of the User.
+  /users/{userId}/events:
+    get:
+      summary: Get Events of a Particular User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: Id of the User whose events we want to get.
+          type: string
+      tags:
+        - Users
+      responses:
+        200:
+          $ref: '#/responses/Events'
+        400:
+          description: Error while getting the events created by the user.
+  /users/{userId}/attendance:
+    get:
+      summary: Get Events that a User is attending.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: Id of the User whose event attendance details we want.
+          type: string
+      tags:
+        - Users
+      responses:
+        200:
+          $ref: '#/responses/Events'
+        400:
+          description: Error while getting events that the user is attending.
+responses:
+  Success:
+    description: Successfully executed the API.
+    schema:
+      $ref: '#/definitions/Success'
+  Events:
+    description: All the Events as requested by the client.
+    schema:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/definitions/Event'
+definitions:
+  NewUser:
+    required:
+      - name
+    properties:
+      name:
+        type: string
+  Success:
+    properties:
+      data:
+        type: object
+        properties:
+          message:
+            type: string
+  User:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+  Location:
+    properties:
+      longitude:
+        type: number
+        format: double
+      latitude:
+        type: number
+        format: double
+  Event:
+    properties:
+      id:
+        type: string
+      title:
+        type: string
+      description:
+        type: string
+      location:
+        $ref: '#/definitions/Location'
+      address:
+        type: string
+      date:
+        type: string
+        format: date
+      duration:
+        type: integer
+        format: int32
+      createdBy:
+        $ref: '#/definitions/User'
