@@ -6,7 +6,7 @@ const userRoutes = Router();
 
 userRoutes
   .post('/', controllers.createUser)
-  .patch('/', userImageUpload, controllers.updateUserDetails)
+  .patch('/', userImageUpload.single('user-image'), controllers.updateUserDetails)
   .get('/id', controllers.getUserDetails)
   .get('/:id/events', controllers.getUserEvents)
   .get('/:id/attendance', controllers.getEventsWithUserAttendance);

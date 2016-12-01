@@ -2,14 +2,14 @@ const db = require('../db');
 
 exports.createUser = function createUser(req, res) {
   const { uid } = req.body;
-  
+
   const query = 'insert into users(uid) values ($1)';
-  
+
   db.none(query, [uid])
     .then(() => {
-      res.status(201).send({data: 'created'});
+      res.status(201).send({ data: { message: 'created' } });
     }, (err) => {
-      res.status(400).send({data: err});
+      res.status(400).send({ data: err });
     });
 };
 
@@ -32,22 +32,22 @@ exports.updateUserDetails = function updateUserDetails(req, res) {
 
   db.none(query, values)
     .then(() => {
-      res.status(200).send({data: 'success'});
+      res.status(200).send({ data: { message: 'success' } });
     }, (err) => {
-      res.status(400).send({data: err});
+      res.status(400).send({ data: err });
     });
 };
 
 exports.getUserDetails = function getUserDetails(req, res) {
   const userId = req.params.id;
-  
-  const query = 'select u.uid as "userId", u.name as "userName" from users u where uid = $1';
-  
+
+  const query = 'select u.uid as "id", u.name from users u where uid = $1';
+
   db.one(query, [userId])
     .then((data) => {
-      res.json({data});
+      res.json({ data });
     }, (err) => {
-      res.status(400).send({data: err});
+      res.status(400).send({ data: err });
     })
 };
 
@@ -60,9 +60,11 @@ exports.getUserEvents = function getUserEvents(req, res) {
 
   db.manyOrNone(query, [userId])
     .then((events) => {
-      res.json({data: events});
+      res.json({
+        data: events.map(formatEventData)
+      });
     }, (err) => {
-      res.status(400).json({data: err});
+      res.status(400).json({ data: err });
     });
 }
 
@@ -78,8 +80,16 @@ exports.getEventsWithUserAttendance = function getEventsWithUserAttendance(req, 
 
   db.manyOrNone(query, [userId])
     .then((events) => {
-      res.json({data: events});
+      res.json({ data: events.map(formatEventData) });
     }, (err) => {
-      res.status(400).json({data: err})
+      res.status(400).json({ data: err })
     });
+}
+
+function formatEventData(event) {
+  event.location = { longitude: event.location.x, latitude: event.location.y };
+  event.createdBy = { id: event.userId, name: event.userName };
+  delete event.userId;
+  delete event.userName;
+  return event;
 }
