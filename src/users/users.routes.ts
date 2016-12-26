@@ -1,6 +1,6 @@
-const Router = require('express').Router;
-const controllers = require('./users.controllers');
-const userImageUpload = require('../middleware/image-upload.middleware').userImageUpload;
+import { Router } from 'express';
+import * as controllers from './users.controllers';
+import { userImageUpload } from '../middleware/image-upload.middleware';
 
 const userRoutes = Router();
 
@@ -11,4 +11,4 @@ userRoutes
   .get('/:id/events', controllers.getUserEvents)
   .get('/:id/attendance', controllers.getEventsWithUserAttendance);
 
-module.exports = userRoutes;
+export default userRoutes;

@@ -1,12 +1,12 @@
-const db = require('../db');
+import db from '../db';
 
-exports.getAttendees = function getAttendees(req, res) {
+export function getAttendees(req: any, res: any) {
   const eventId = req.params.id;
 
   const query = `select u.uid as "userId", u.name as "userName" from users as u
   left join attendance as a on a.user_id = u.uid
   left join events as e on e.id = a.event_id
-  where e.id = $1`
+  where e.id = $1`;
   const values = [eventId];
 
   db.manyOrNone(query, values)
@@ -17,7 +17,7 @@ exports.getAttendees = function getAttendees(req, res) {
     });
 }
 
-exports.attendEvent = function attendEvent(req, res) {
+export function attendEvent(req: any, res: any) {
   const { uid } = req.body;
   const eventId = req.params.id;
 
@@ -32,7 +32,7 @@ exports.attendEvent = function attendEvent(req, res) {
     });
 }
 
-exports.removeAttendanceFromEvent = function removeAttendanceFromEvent(req, res) {
+export function removeAttendanceFromEvent(req: any, res: any) {
   const { uid } = req.body;
   const eventId = req.params.id;
 

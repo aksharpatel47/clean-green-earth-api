@@ -1,27 +1,38 @@
-const db = require('../db');
+import db from '../db';
 
-exports.createUser = function createUser(req, res) {
-  const { uid } = req.body;
+/**
+ * Creates user on the server. This is called after firebase creates
+ * the user at their server.
+ * @param req
+ * @param res
+ */
+export function createUser(req: any, res: any) {
+  const { uid, name } = req.body;
 
-  const query = 'insert into users(uid) values ($1)';
+  const query = 'insert into users(uid, name) values ($1, $2)';
 
-  db.none(query, [uid])
+  db.none(query, [uid, name])
     .then(() => {
       res.status(201).send({ data: { message: 'created' } });
     }, (err) => {
       res.status(400).send({ data: err });
     });
-};
+}
 
-exports.updateUserDetails = function updateUserDetails(req, res) {
+/**
+ *
+ * @param req
+ * @param res
+ */
+export function updateUserDetails(req: any, res: any) {
   const { uid, name } = req.body;
 
-  let query;
+  let query = '';
   let values = [];
 
   if (req.file) {
     let fileName = req.file.filename;
-    query = 'update users set image = $1, updated_on = $2 where uid = $3'
+    query = 'update users set image = $1, updated_on = $2 where uid = $3';
     values.push(fileName);
   } else if (name) {
     query = 'update users set name = $1, updated_on = $2 where uid = $3';
@@ -36,9 +47,9 @@ exports.updateUserDetails = function updateUserDetails(req, res) {
     }, (err) => {
       res.status(400).send({ data: err });
     });
-};
+}
 
-exports.getUserDetails = function getUserDetails(req, res) {
+export function getUserDetails(req: any, res: any) {
   const userId = req.params.id;
 
   const query = 'select u.uid as "id", u.name from users u where uid = $1';
@@ -49,9 +60,9 @@ exports.getUserDetails = function getUserDetails(req, res) {
     }, (err) => {
       res.status(400).send({ data: err });
     })
-};
+}
 
-exports.getUserEvents = function getUserEvents(req, res) {
+export function getUserEvents(req: any, res: any) {
   const userId = req.params.id;
 
   const query = `select e.id, e.title, e.description, e.location, e.address, e.date, e.duration,
@@ -68,7 +79,7 @@ exports.getUserEvents = function getUserEvents(req, res) {
     });
 }
 
-exports.getEventsWithUserAttendance = function getEventsWithUserAttendance(req, res) {
+export function getEventsWithUserAttendance(req: any, res: any) {
   const userId = req.params.id;
 
   const query = `select e.id, e.title, e.description, e.location, e.address, e.date, e.duration,
@@ -86,7 +97,7 @@ exports.getEventsWithUserAttendance = function getEventsWithUserAttendance(req, 
     });
 }
 
-function formatEventData(event) {
+function formatEventData(event: any) {
   event.location = { longitude: event.location.x, latitude: event.location.y };
   event.createdBy = { id: event.userId, name: event.userName };
   delete event.userId;

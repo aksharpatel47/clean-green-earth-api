@@ -28,9 +28,9 @@ create table if not exists attendance (
   primary key (event_id, user_id)
 );
 
-create index events_user_id_fkey_index on events (user_id);
-create index attendance_user_id_fkey_index on attendance (user_id);
-create index attendance_event_id_fkey_index on attendance (event_id);
+create index if not exists events_user_id_fkey_index on events (user_id);
+create index if not exists attendance_user_id_fkey_index on attendance (user_id);
+create index if not exists attendance_event_id_fkey_index on attendance (event_id);
 
-create extension cube;
-create extension earthdistance;
+create extension if not exists cube;
+create extension if not exists earthdistance;

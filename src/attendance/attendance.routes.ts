@@ -1,5 +1,5 @@
-const Router = require('express').Router;
-const controllers = require('./attendance.controllers');
+import { Router } from 'express';
+import * as controllers from './attendance.controllers';
 
 const attendanceRoutes = Router();
 
@@ -8,4 +8,4 @@ attendanceRoutes
   .post('/:id/attendance', controllers.attendEvent)
   .delete('/:id/attendance', controllers.removeAttendanceFromEvent);
 
-module.exports = attendanceRoutes;
+export default attendanceRoutes;

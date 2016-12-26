@@ -1,10 +1,10 @@
-const db = require('../db');
-const uuid = require('uuid');
+import db from '../db';
+import * as uuid from 'uuid';
 
 /**
  * Get details of the event with id sent in the params.
  */
-exports.getEventDetails = function getEventDetails(req, res) {
+export function getEventDetails(req: any, res: any) {
   const eventId = req.params.id;
 
   const query = `select e.id, e.title, e.description, e.location, e.address, e.date, e.duration, 
@@ -20,7 +20,7 @@ exports.getEventDetails = function getEventDetails(req, res) {
       if (!eventData) {
         return res.status(404).json({data: {message: 'No such event exists.'}});
       }
-      
+
       res.status(200).json({data: eventData})
     }, (err) => {
       res.status(400).json({data: err});
@@ -30,7 +30,7 @@ exports.getEventDetails = function getEventDetails(req, res) {
 /**
  * Search Events happening around a location within a particular radius.
  */
-exports.searchEvents = function searchEvents(req, res) {
+export function searchEvents(req: any, res: any) {
   const { latitude, longitude, radius } = req.query;
 
   const query = `select e.id, e.title, e.description, e.location, e.address, e.date, e.duration,
@@ -38,7 +38,7 @@ exports.searchEvents = function searchEvents(req, res) {
   from events as e
   left join users u on e.user_id = u.uid 
   where (($1::point <@> e.location)::numeric * 1.61) < $2`;
-  const values = [`(${longitude},${latitude})`, radius]
+  const values = [`(${longitude},${latitude})`, radius];
 
   db.manyOrNone(query, values)
     .then((events) => {
@@ -51,7 +51,7 @@ exports.searchEvents = function searchEvents(req, res) {
 /**
  * Create Event and send the eventId back.
  */
-exports.createEvent = function createEvent(req, res) {
+export function createEvent(req: any, res: any) {
   const { uid, title, description, location, address, date, duration } = req.body;
   const { latitude, longitude } = location;
   let imageFileName;
@@ -77,7 +77,7 @@ exports.createEvent = function createEvent(req, res) {
  * Update event details based on the id sent in the params. It
  * updates all the details of the event apart from the image.
  */
-exports.updateEvent = function updateEvent(req, res) {
+export function updateEvent(req: any, res: any) {
   const eventId = req.params.id;
   const { uid, title, description, location, address, date, duration } = req.body;
 
@@ -99,7 +99,7 @@ exports.updateEvent = function updateEvent(req, res) {
  * Patch Event Details updtes the event with a new image.
  * // TODO: Remove old image when new image is updated.
  */
-exports.patchEventDetails = function patchEventDetails(req, res) {
+export function patchEventDetails(req: any, res: any) {
   const { uid, eventId } = req.body;
 
   if (req.file) {
@@ -121,7 +121,7 @@ exports.patchEventDetails = function patchEventDetails(req, res) {
 /**
  * Delete the event based on the id sent in the params.
  */
-exports.deleteEvent = function deleteEvent(req, res) {
+export function deleteEvent(req: any, res: any) {
   const eventId = req.params.id;
   const { uid } = req.body;
 
