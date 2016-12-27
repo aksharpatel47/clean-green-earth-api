@@ -7,7 +7,7 @@ const userStorage = multer.diskStorage({
     cb(null, req.body.uid + '-' + Date.now() + '.jpg');
   },
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, 'images/users'));
+    cb(null, path.join(__dirname, '../../images/users'));
   }
 });
 
@@ -18,6 +18,9 @@ const eventStorage = multer.diskStorage({
     let eventId = req.params.id || uuid.v4();
     req.body.eventId = eventId;
     cb(null, eventId + '-' + Date.now() + '.jpg');
+  },
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '../../images/events'))
   }
 });
 
