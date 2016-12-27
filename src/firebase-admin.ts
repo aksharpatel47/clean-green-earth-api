@@ -2,7 +2,8 @@ import * as admin from 'firebase-admin';
 import { readFileSync } from 'fs';
 import * as path from 'path';
 
-const serviceAccountKey = require('./serviceAccountKey.json');
+const serviceKeyPath = path.resolve(__dirname, '../serviceAccountKey.json');
+const serviceAccountKey = require(serviceKeyPath);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccountKey),
