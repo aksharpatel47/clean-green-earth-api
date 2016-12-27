@@ -7,11 +7,12 @@ import db from '../db';
  * @param res
  */
 export function createUser(req: any, res: any) {
-  const { uid, name } = req.body;
+  const { uid, name, photoUrl } = req.body;
 
-  const query = 'insert into users(uid, name) values ($1, $2)';
+  const query = `insert into users(uid, name, image) values ($1, $2, $3) on conflict (uid) 
+    do update set name = EXCLUDED.name, image = EXCLUDED.image`;
 
-  db.none(query, [uid, name])
+  db.none(query, [uid, name, photoUrl])
     .then(() => {
       res.status(201).send({ data: { message: 'created' } });
     }, (err) => {
