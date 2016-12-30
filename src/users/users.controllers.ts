@@ -1,4 +1,6 @@
 import db from '../db';
+import firebaseAdmin from '../firebase-admin';
+import { Auth } from 'firebase-admin/lib/auth/auth';
 
 /**
  * Creates user on the server. This is called after firebase creates
@@ -7,17 +9,48 @@ import db from '../db';
  * @param res
  */
 export function createUser(req: any, res: any) {
-  const { uid, name, photoUrl } = req.body;
+  const { uid, name, email, password, photoURL } = req.body;
+  const query = `insert into users(uid, name, image) values ($1, $2, $3)`;
 
-  const query = `insert into users(uid, name, image) values ($1, $2, $3) on conflict (uid) 
-    do update set name = EXCLUDED.name, image = EXCLUDED.image`;
+  /**
+   * If the user is creating an account using email+password, create a user
+   * on firebase and add a new database entry.
+   */
 
-  db.none(query, [uid, name, photoUrl])
-    .then(() => {
-      res.status(201).send({ data: { message: 'created' } });
-    }, (err) => {
-      res.status(400).send({ data: err });
-    });
+  if (!!email && !!name && !!password) {
+    (<Auth>firebaseAdmin.auth()).createUser({
+      email,
+      password,
+      emailVerified: false,
+      displayName: name,
+      disabled: false
+    }).then((record) => {
+      return db.none(query, [record.uid, name, photoURL])
+    })
+      .then(() => {
+        res.status(200).json({ data: { message: 'created' } })
+      }, (err) => {
+        res.status(400).json({ data: err })
+      })
+  } else if (!!uid && !!name) {
+
+    /**
+     * Since the user has chosen to signin via Facebook, just add a new database
+     * entry for the user.
+     */
+
+    db.none(query, [uid, name, photoURL])
+      .then(() => {
+        res.status(200).json({ data: { message: 'created' } })
+      }, (err) => {
+        res.status(400).json({ data: err })
+      })
+  }
+}
+
+async function addUserToDb(uid: string, name: string, photoURL: string) {
+  const query = `insert into users(uid, name, image) values ($1, $2, $3)`;
+  await db.none(query, [uid, name, photoURL])
 }
 
 /**

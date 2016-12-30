@@ -2,6 +2,10 @@ import firebaseAdmin from '../firebase-admin';
 import { Request, Response } from 'express';
 
 export default function firebaseAuthMiddleware(req: Request, res: Response, next: any): any {
+  if (req.path === "/users" && req.method === "POST") {
+    return next()
+  }
+
   let authorizationToken = req.get('Authorization');
 
   if (!authorizationToken) {
