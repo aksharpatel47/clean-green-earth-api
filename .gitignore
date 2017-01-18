@@ -2,4 +2,5 @@
 .vscode
 build
 node_modules
+images
 serviceAccountKey.json
