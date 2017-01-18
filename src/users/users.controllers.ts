@@ -1,6 +1,6 @@
 import db from '../db';
-import firebaseAdmin from '../firebase-admin';
-import { Auth } from 'firebase-admin/lib/auth/auth';
+import { Request, Response } from 'express';
+import { ICreateUserRequest } from './user.schemas';
 
 /**
  * Creates user on the server. This is called after firebase creates
@@ -8,49 +8,29 @@ import { Auth } from 'firebase-admin/lib/auth/auth';
  * @param req
  * @param res
  */
-export function createUser(req: any, res: any) {
-  const { uid, name, email, password, photoURL } = req.body;
+export function createUser(req: ICreateUserRequest, res: Response) {
+  const { name, photoURL } = req.body;
+  const { uid } = req.user;
   const query = `insert into users(uid, name, image) values ($1, $2, $3)`;
 
-  /**
-   * If the user is creating an account using email+password, create a user
-   * on firebase and add a new database entry.
-   */
-
-  if (!!email && !!name && !!password) {
-    (<Auth>firebaseAdmin.auth()).createUser({
-      email,
-      password,
-      emailVerified: false,
-      displayName: name,
-      disabled: false
-    }).then((record) => {
-      return db.none(query, [record.uid, name, photoURL])
-    })
-      .then(() => {
-        res.status(200).json({ data: { message: 'created' } })
-      }, (err) => {
-        res.status(400).json({ data: err })
-      })
-  } else if (!!uid && !!name) {
-
-    /**
-     * Since the user has chosen to signin via Facebook, just add a new database
-     * entry for the user.
-     */
-
-    db.none(query, [uid, name, photoURL])
-      .then(() => {
-        res.status(200).json({ data: { message: 'created' } })
-      }, (err) => {
-        res.status(400).json({ data: err })
-      })
-  }
+  db.none(query, [ uid, name, photoURL ])
+    .then(() => res.status(201).json({ data: { message: 'Created.' } }))
+    .catch((error) => res.status(400).json({ data: { error } }));
 }
 
 async function addUserToDb(uid: string, name: string, photoURL: string) {
   const query = `insert into users(uid, name, image) values ($1, $2, $3)`;
-  await db.none(query, [uid, name, photoURL])
+  await db.none(query, [ uid, name, photoURL ]);
+}
+
+export function updateUserDetails(req: Request, res: Response) {
+  const { uid, name } = req.body;
+
+  const query = `update users set name = $1, updated_on = $2 where uid = $3`;
+
+  db.none(query, [ name, new Date(), uid ])
+    .then(() => res.status(200).send({ data: { message: 'Updated.' } }))
+    .catch((error) => res.status(400).send({ data: { error } }));
 }
 
 /**
@@ -58,52 +38,59 @@ async function addUserToDb(uid: string, name: string, photoURL: string) {
  * @param req
  * @param res
  */
-export function updateUserDetails(req: any, res: any) {
+export function patchUserDetails(req: Request, res: Response) {
   const { uid, name } = req.body;
 
-  let query = '';
-  let values = [];
+  const query = 'update users set image = $1, updated_on = $2 where uid = $3';
 
-  if (req.file) {
-    let fileName = req.file.filename;
-    query = 'update users set image = $1, updated_on = $2 where uid = $3';
-    values.push(fileName);
-  } else if (name) {
-    query = 'update users set name = $1, updated_on = $2 where uid = $3';
-    values.push(name);
+  if (!req.file) {
+    return res.status(400).json({ data: { message: 'No image to update.' } });
   }
 
-  values.push(new Date(), uid);
+  const filename = req.file.filename;
 
-  db.none(query, values)
-    .then(() => {
-      res.status(200).send({ data: { message: 'success' } });
+  db.none(query, [ filename, new Date(), uid ])
+    .then(() => res.status(200).send({ data: { message: 'success' } }))
+    .catch((err) => res.status(400).send({ data: err }));
+}
+
+/**
+ * getUserDetails method gets the details of the user having the id
+ * sent in the parameters. If the user does not exist, respond with
+ * 404, else respond with the user details.
+ * @param req
+ * @param res
+ */
+export function getUserDetails(req: Request, res: Response) {
+  const uid = req.body.uid as string;
+  const userId = req.params.id as string || uid;
+
+  const query = `select u.uid as "id", u.name from users u where uid = $1`;
+
+  db.any(query, [ userId ])
+    .then((data) => {
+
+      const user = data[ 0 ] || undefined;
+
+      if (user) {
+        return res.json({ data: user });
+      }
+
+      res.status(404).json({ data: { message: `No user found with the id ${userId}` } });
+
     }, (err) => {
       res.status(400).send({ data: err });
     });
 }
 
-export function getUserDetails(req: any, res: any) {
-  const userId = req.params.id;
-
-  const query = 'select u.uid as "id", u.name from users u where uid = $1';
-
-  db.one(query, [userId])
-    .then((data) => {
-      res.json({ data });
-    }, (err) => {
-      res.status(400).send({ data: err });
-    })
-}
-
-export function getUserEvents(req: any, res: any) {
+export function getUserEvents(req: Request, res: Response) {
   const userId = req.params.id;
 
   const query = `select e.id, e.title, e.description, e.location, e.address, e.date, e.duration,
   e.user_id as "userId", u.name as "userName" from events e
   left join users u on e.user_id = u.uid where u.uid = $1`;
 
-  db.manyOrNone(query, [userId])
+  db.manyOrNone(query, [ userId ])
     .then((events) => {
       res.json({
         data: events.map(formatEventData)
@@ -113,7 +100,7 @@ export function getUserEvents(req: any, res: any) {
     });
 }
 
-export function getEventsWithUserAttendance(req: any, res: any) {
+export function getEventsWithUserAttendance(req: Request, res: Response) {
   const userId = req.params.id;
 
   const query = `select e.id, e.title, e.description, e.location, e.address, e.date, e.duration,
@@ -123,11 +110,11 @@ export function getEventsWithUserAttendance(req: any, res: any) {
   where a.user_id = $1
   order by e.date asc`;
 
-  db.manyOrNone(query, [userId])
+  db.manyOrNone(query, [ userId ])
     .then((events) => {
       res.json({ data: events.map(formatEventData) });
     }, (err) => {
-      res.status(400).json({ data: err })
+      res.status(400).json({ data: err });
     });
 }
 
