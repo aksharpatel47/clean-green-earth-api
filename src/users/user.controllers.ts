@@ -1,6 +1,6 @@
 import { db } from "../utilities/db"
 import { Request, Response } from "express"
-import { ICreateUserRequest, IGetUserDetailsRequest } from "./user.schemas"
+import { ICreateUserRequest, IGetUserDetailsRequest, IPatchUserDetailsRequest } from "./user.schemas"
 import { user } from "./user.model"
 
 /**
@@ -36,23 +36,34 @@ export function createUser(req: ICreateUserRequest, res: Response) {
  * @param req
  * @param res
  */
-export function patchUserDetails(req: Request, res: Response) {
-  const { uid, name } = req.body
+export function patchUserDetails(req: IPatchUserDetailsRequest, res: Response) {
+  const { uid } = req.user
+  const { name } = req.body
 
-  const query = "update users set image = $1, updated_on = $2 where uid = $3"
+  let updatePromise: Promise<any> | undefined
 
-  if (!req.file) {
-    return res.status(400).json({ data: { message: "No image to update." } })
+  if (name) {
+    updatePromise = user.updateDetails(uid, { name })
+  } else if (req.file) {
+    updatePromise = user.updateDetails(uid, { image: req.file.filename })
   }
 
-  const filename = req.file.filename
+  if (updatePromise) {
+    return updatePromise
+      .then(() => res.status(200).send({ data: { message: "User details updated." } }))
+      .catch((error) => {
+        // TODO: Log Error
+        console.error("patchUserDetails: ", error)
+        res.status(400).send({
+          error: {
+            description: "Error while updating user details.",
+            details: [{ path: "postgres", message: error.message }]
+          }
+        })
+      })
+  }
 
-  db.none(query, [filename, new Date(), uid])
-    .then(() => res.status(200).send({ data: { message: "success" } }))
-    .catch((err) => {
-      // TODO: Log Error
-      res.status(400).send({ data: err })
-    })
+  res.status(400).send({ error: { description: "No details sent to update.", details: [] } })
 }
 
 /**

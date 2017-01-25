@@ -11,3 +11,9 @@ export interface IGetUserDetailsRequest extends IAuthenticatedRequest {
     id?: string
   }
 }
+
+export interface IPatchUserDetailsRequest extends IAuthenticatedRequest {
+  body: {
+    name?: string
+  }
+}
