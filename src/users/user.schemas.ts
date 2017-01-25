@@ -5,3 +5,9 @@ export interface ICreateUserRequest extends IAuthenticatedRequest {
     name: string
   }
 }
+
+export interface IGetUserDetailsRequest extends IAuthenticatedRequest {
+  params: {
+    id?: string
+  }
+}

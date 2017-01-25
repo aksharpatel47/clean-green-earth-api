@@ -1,6 +1,6 @@
 import { db } from "../utilities/db"
 import { Request, Response } from "express"
-import { ICreateUserRequest } from "./user.schemas"
+import { ICreateUserRequest, IGetUserDetailsRequest } from "./user.schemas"
 import { user } from "./user.model"
 
 /**
@@ -62,8 +62,8 @@ export function patchUserDetails(req: Request, res: Response) {
  * @param req
  * @param res
  */
-export function getUserDetails(req: Request, res: Response) {
-  const uid = req.body.uid as string
+export function getUserDetails(req: IGetUserDetailsRequest, res: Response) {
+  const uid = req.user.uid as string
   const userId = req.params.id as string || uid
 
   user.getWithId(userId)
