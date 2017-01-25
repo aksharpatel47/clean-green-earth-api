@@ -1,19 +1,30 @@
-import * as express from 'express';
+import * as express from "express"
+import * as morgan from "morgan"
+import * as bodyParser from "body-parser"
+import * as path from "path"
+import { firebaseAuthMiddleware } from "./middleware/firebase-auth.middleware"
 
-import * as bodyParser from 'body-parser';
-import firebaseAuthMiddleware from './middleware/firebase-auth.middleware';
+/**
+ * Import Routes
+ */
+import eventRoutes from "./events"
+import { userRoutes } from "./users/user.routes"
 
-import eventRoutes from './events';
-import userRoutes from './users';
+/**
+ * Initialize Express App
+ */
+export const app = express()
 
-const app = express();
+/**
+ * Import Middlewares
+ */
+app.use(morgan("dev"))
+app.use("/static/images", express.static(path.resolve(__dirname, "../images")))
+app.use(bodyParser.json())
+app.use(firebaseAuthMiddleware)
 
-// Middlewares
-app.use(bodyParser.json());
-app.use(firebaseAuthMiddleware);
-
-// Routes
-app.use('/users', userRoutes);
-app.use('/events', eventRoutes);
-
-export default app;
+/**
+ * Register Routes
+ */
+app.use("/users", userRoutes)
+app.use("/events", eventRoutes)

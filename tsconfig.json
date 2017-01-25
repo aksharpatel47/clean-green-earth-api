@@ -3,8 +3,8 @@
     "target": "es6",
     "module": "commonjs",
     "sourceMap": true,
-    "sourceRoot": "./src",
-    "outDir": "./build"
+    "sourceRoot": "src",
+    "outDir": "build"
   },
   "include": [
     "src"
