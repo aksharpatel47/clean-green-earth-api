@@ -1,6 +1,5 @@
 import { firebaseAdmin } from "../firebase-admin"
 import { Request, Response } from "express"
-import { Auth } from "firebase-admin/lib/auth/auth"
 
 export interface IFirebaseUser {
   uid: string
@@ -37,9 +36,9 @@ export function firebaseAuthMiddleware(req: Request, res: Response, next: any) {
     return res.sendStatus(401)
   }
 
-  const token = tokenComponents[1];
+  const token = tokenComponents[1]
 
-  (firebaseAdmin.auth() as Auth).verifyIdToken(token)
+  firebaseAdmin.auth().verifyIdToken(token)
     .then((decodedToken: any) => {
       req["user"] = decodedToken
       next()
