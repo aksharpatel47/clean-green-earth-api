@@ -2,6 +2,7 @@ import { db } from "../utilities/db"
 import { Request, Response } from "express"
 import { ICreateUserRequest, IGetUserDetailsRequest, IPatchUserDetailsRequest } from "./user.schemas"
 import { user } from "./user.model"
+import { getImageURL, ImageType } from "../utilities/image.utilities"
 
 /**
  * Creates user on the server. This is called after firebase creates
@@ -83,7 +84,7 @@ export function getUserDetails(req: IGetUserDetailsRequest, res: Response) {
         return res.status(404).json({ error: { description: "No such user found." } })
       }
 
-      res.json({ data: { user: userData } })
+      res.json({ data: { user: Object.assign(userData, { image: getImageURL(userData.image, ImageType.users) }) } })
     }, (err) => {
       // TODO: Log Error
       res.status(400).json({
