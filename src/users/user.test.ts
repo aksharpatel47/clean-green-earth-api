@@ -3,7 +3,6 @@ import { UserModel, IUser } from "./user.model"
 import { db } from "../utilities/db"
 import * as request from "supertest"
 import { app } from "../app"
-import auth = admin.auth
 
 describe("User Module", function () {
   const user: IUser = { uid: "new-user-id", name: "Anonymous", image: undefined }
