@@ -7,7 +7,7 @@ import { firebaseAuthMiddleware } from "./middleware/firebase-auth.middleware"
 /**
  * Import Routes
  */
-import { eventRoutes } from "./events/events.routes"
+import { eventRoutes } from "./events/event.routes"
 import { userRoutes } from "./users/user.routes"
 
 /**

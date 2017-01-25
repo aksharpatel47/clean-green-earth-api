@@ -1,5 +1,5 @@
 import { Router } from "express"
-import * as controllers from "./events.controllers"
+import * as controllers from "./event.controllers"
 import attendanceRoutes from "../attendance"
 import { eventImageUpload } from "../middleware/image-upload.middleware"
 
