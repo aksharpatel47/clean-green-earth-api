@@ -123,8 +123,9 @@ export function getUserEvents(req: IGetUserEventsRequest, res: Response) {
     db.manyOrNone(userEventsQuery, [userId]),
     db.manyOrNone(userAttendingEventsQuery, [userId])
   ]).then((data) => {
-    const events = data.reduce((events, arr) => events.concat(arr), []).sort((ev1, ev2) => ev1.date - ev2.date).map(event => formatEventData(event))
-    res.json({ data: { events } })
+    const created = data[0].sort((ev1, ev2) => ev1.date - ev2.date).map(event => formatEventData(event))
+    const attending = data[1].sort((ev1, ev2) => ev1.date - ev2.date).map(event => formatEventData(event))
+    res.json({ data: { created, attending } })
   })
     .catch((err) => {
       console.error("getUserEvents: ", userId, err)
