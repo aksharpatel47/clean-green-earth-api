@@ -7,6 +7,7 @@ export enum ImageType {
 export function getImageURL(image: string, type: ImageType) {
   const hostName = config.host.host
   const protocol = config.host.protocol
+  const port = config.host.port
 
-  return `${protocol}://${hostName}/static/images/${ImageType[type]}/${image}`
+  return `${protocol}://${hostName}:${port}/static/images/${ImageType[type]}/${image}`
 }
