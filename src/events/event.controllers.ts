@@ -3,6 +3,7 @@ import { Response } from "express"
 import * as uuid from "uuid"
 import { ICreateEventRequest, ISearchEventRequest } from "./event.schemas"
 import { formatEventData } from "../utilities/event.utilities"
+import { getImageURL, ImageType } from "../utilities/image.utilities"
 
 /**
  * Get details of the event with id sent in the params.
@@ -78,7 +79,7 @@ export function createEvent(req: ICreateEventRequest, res: Response) {
 
   db.none(query, values)
     .then(() => {
-      res.status(201).json({ data: { id: eventId } })
+      res.status(201).json({ data: { id: eventId, image: getImageURL(imageFileName, ImageType.events) } })
     }, (err) => {
       res.status(400).json({ data: err })
     })

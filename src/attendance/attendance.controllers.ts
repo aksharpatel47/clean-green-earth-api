@@ -1,4 +1,5 @@
 import { db } from "../utilities/db"
+import { IAuthenticatedRequest } from "../middleware/firebase-auth.middleware"
 
 export function getAttendees(req: any, res: any) {
   const eventId = req.params.id
@@ -17,8 +18,8 @@ export function getAttendees(req: any, res: any) {
     })
 }
 
-export function attendEvent(req: any, res: any) {
-  const { uid } = req.body
+export function attendEvent(req: IAuthenticatedRequest, res: any) {
+  const { uid } = req.user
   const eventId = req.params.id
 
   const query = `insert into attendance(user_id, event_id) values($1, $2)`
@@ -32,8 +33,8 @@ export function attendEvent(req: any, res: any) {
     })
 }
 
-export function removeAttendanceFromEvent(req: any, res: any) {
-  const { uid } = req.body
+export function removeAttendanceFromEvent(req: IAuthenticatedRequest, res: any) {
+  const { uid } = req.user
   const eventId = req.params.id
 
   const query = `delete from attendance where user_id = $1 and event_id = $2`

@@ -1,9 +1,9 @@
 import { Router } from "express"
 import * as controllers from "./event.controllers"
-import attendanceRoutes from "../attendance"
 import { eventImageUpload } from "../middleware/image-upload.middleware"
 import { validate } from "../middleware/schema-validation.middleware"
 import { searchEventsSchema } from "./event.schemas"
+import { attendanceRoutes } from "../attendance/attendance.routes"
 
 export const eventRoutes = Router()
 
