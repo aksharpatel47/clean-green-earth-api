@@ -1,10 +1,12 @@
 import { db } from "../utilities/db"
+import { Response } from "express"
 import * as uuid from "uuid"
+import { ICreateEventRequest } from "./event.schemas"
 
 /**
  * Get details of the event with id sent in the params.
  */
-export function getEventDetails(req: any, res: any) {
+export function getEventDetails(req: any, res: Response) {
   const eventId = req.params.id
 
   const query = `select e.id, e.title, e.description, e.location, e.address, e.date, e.duration, 
@@ -30,7 +32,7 @@ export function getEventDetails(req: any, res: any) {
 /**
  * Search Events happening around a location within a particular radius.
  */
-export function searchEvents(req: any, res: any) {
+export function searchEvents(req: any, res: Response) {
   const { latitude, longitude, radius } = req.query
 
   const query = `select e.id, e.title, e.description, e.location, e.address, e.date, e.duration,
@@ -51,11 +53,12 @@ export function searchEvents(req: any, res: any) {
 /**
  * Create Event and send the eventId back.
  */
-export function createEvent(req: any, res: any) {
-  const { uid, title, description, location, address, date, duration } = req.body
-  const { latitude, longitude } = location
-  let imageFileName
+export function createEvent(req: ICreateEventRequest, res: Response) {
+  const { uid } = req.user
+  const { title, description, latitude, longitude, address, date, duration } = req.body
+  let imageFileName: string | undefined
   const eventId = uuid.v4()
+  const hours = parseInt(duration)
 
   if (req.file) {
     imageFileName = req.file.filename
@@ -63,11 +66,11 @@ export function createEvent(req: any, res: any) {
 
   const query = `insert into events(id, title, description, image, location, address, date, duration, user_id)
   values($1, $2, $3, $4, $5, $6, $7, $8, $9)`
-  const values = [eventId, title, description, imageFileName, `(${longitude},${latitude})`, address, date, duration, uid]
+  const values = [eventId, title, description, imageFileName, `(${longitude},${latitude})`, address, date, hours, uid]
 
   db.none(query, values)
     .then(() => {
-      res.status(201).json({ data: { eventId } })
+      res.status(201).json({ data: { id: eventId } })
     }, (err) => {
       res.status(400).json({ data: err })
     })
@@ -77,7 +80,7 @@ export function createEvent(req: any, res: any) {
  * Update event details based on the id sent in the params. It
  * updates all the details of the event apart from the image.
  */
-export function updateEvent(req: any, res: any) {
+export function updateEvent(req: any, res: Response) {
   const eventId = req.params.id
   const { uid, title, description, location, address, date, duration } = req.body
 
@@ -99,7 +102,7 @@ export function updateEvent(req: any, res: any) {
  * Patch Event Details updtes the event with a new image.
  * // TODO: Remove old image when new image is updated.
  */
-export function patchEventDetails(req: any, res: any) {
+export function patchEventDetails(req: any, res: Response) {
   const { uid, eventId } = req.body
 
   if (req.file) {
@@ -121,7 +124,7 @@ export function patchEventDetails(req: any, res: any) {
 /**
  * Delete the event based on the id sent in the params.
  */
-export function deleteEvent(req: any, res: any) {
+export function deleteEvent(req: any, res: Response) {
   const eventId = req.params.id
   const { uid } = req.body
 
