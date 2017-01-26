@@ -22,8 +22,9 @@ export function attendEvent(req: IAuthenticatedRequest, res: any) {
   const { uid } = req.user
   const eventId = req.params.id
 
-  const query = `insert into attendance(user_id, event_id) values($1, $2)`
-  const values = [uid, eventId]
+  const query = `insert into attendance(user_id, event_id) values($1, $2) 
+    on conflict(user_id, event_id) do update set updated_on = $3`
+  const values = [uid, eventId, new Date()]
 
   db.none(query, values)
     .then(() => {
