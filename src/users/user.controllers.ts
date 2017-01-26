@@ -8,6 +8,7 @@ import {
 } from "./user.schemas"
 import { user } from "./user.model"
 import { getImageURL, ImageType } from "../utilities/image.utilities"
+import { formatEventData } from "../utilities/event.utilities"
 
 /**
  * Creates user on the server. This is called after firebase creates
@@ -152,15 +153,4 @@ export function getEventsWithUserAttendance(req: Request, res: Response) {
     }, (err) => {
       res.status(400).json({ data: err })
     })
-}
-
-function formatEventData(event: any) {
-  event.longitude = parseFloat(event.location.x)
-  event.latitude = parseFloat(event.location.y)
-  event.createdBy = { id: event.userId, name: event.userName }
-  event.image = !!event.image ? getImageURL(event.image, ImageType.events) : ""
-  delete event.userId
-  delete event.userName
-  delete event.location
-  return event
 }
