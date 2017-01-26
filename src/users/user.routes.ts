@@ -11,6 +11,7 @@ userRoutes
   .patch(userImageUpload.single("user-image"), userControllers.patchUserDetails)
 
 userRoutes
+  .get("/events", userControllers.getUserEvents)
   .get("/:id", userControllers.getUserDetails)
   .get("/:id/events", userControllers.getUserEvents)
   .get("/:id/attendance", userControllers.getEventsWithUserAttendance)

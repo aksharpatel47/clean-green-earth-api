@@ -1,6 +1,11 @@
 import { db } from "../utilities/db"
 import { Request, Response } from "express"
-import { ICreateUserRequest, IGetUserDetailsRequest, IPatchUserDetailsRequest } from "./user.schemas"
+import {
+  ICreateUserRequest,
+  IGetUserDetailsRequest,
+  IPatchUserDetailsRequest,
+  IGetUserEventsRequest
+} from "./user.schemas"
 import { user } from "./user.model"
 import { getImageURL, ImageType } from "../utilities/image.utilities"
 
@@ -96,34 +101,52 @@ export function getUserDetails(req: IGetUserDetailsRequest, res: Response) {
     })
 }
 
-export function getUserEvents(req: Request, res: Response) {
-  const userId = req.params.id
+export function getUserEvents(req: IGetUserEventsRequest, res: Response) {
+  const { uid } = req.user
+  const userId = req.params.id || uid
 
-  const query = `select e.id, e.title, e.description, e.location, e.address, e.date, e.duration,
-  e.user_id as "userId", u.name as "userName" from events e
-  left join users u on e.user_id = u.uid where u.uid = $1`
+  const userEventsQuery = `
+    select e.id, e.image, e.title, e.description, e.location, e.address, e.date, e.duration,
+    e.user_id as "userId", u.name as "userName" from events e
+    left join users u on e.user_id = u.uid where u.uid = $1
+  `
+  const userAttendingEventsQuery = `
+    select e.id, e.image, e.title, e.description, e.location, e.address, e.date, e.duration,
+      e.user_id as "userId", u.name as "userName" from events e
+      left join users u on u.uid = e.user_id
+      left join attendance a on a.event_id = e.id
+      where a.user_id = $1
+  `
 
-  db.manyOrNone(query, [userId])
-    .then((events) => {
-      res.json({
-        data: events.map(formatEventData)
+  Promise.all([
+    db.manyOrNone(userEventsQuery, [userId]),
+    db.manyOrNone(userAttendingEventsQuery, [userId])
+  ]).then((data) => {
+    const events = data.reduce((events, arr) => events.concat(arr), []).sort((ev1, ev2) => ev1.date - ev2.date).map(event => formatEventData(event))
+    res.json({ data: { events } })
+  })
+    .catch((err) => {
+      console.error("getUserEvents: ", userId, err)
+      res.status(400).json({
+        error: {
+          description: "Error while getting user events.",
+          details: [{ path: "postgres", message: err.message }]
+        }
       })
-    }, (err) => {
-      res.status(400).json({ data: err })
     })
 }
 
 export function getEventsWithUserAttendance(req: Request, res: Response) {
   const userId = req.params.id
 
-  const query = `select e.id, e.title, e.description, e.location, e.address, e.date, e.duration,
+  const userAttendingEventsQuery = `select e.id, e.title, e.description, e.location, e.address, e.date, e.duration,
   e.user_id as "userId", u.name as "userName" from events e
   left join users u on u.uid = e.user_id
   left join attendance a on a.event_id = e.id
   where a.user_id = $1
   order by e.date asc`
 
-  db.manyOrNone(query, [userId])
+  db.manyOrNone(userAttendingEventsQuery, [userId])
     .then((events) => {
       res.json({ data: events.map(formatEventData) })
     }, (err) => {
@@ -132,9 +155,12 @@ export function getEventsWithUserAttendance(req: Request, res: Response) {
 }
 
 function formatEventData(event: any) {
-  event.location = { longitude: event.location.x, latitude: event.location.y }
+  event.longitude = parseFloat(event.location.x)
+  event.latitude = parseFloat(event.location.y)
   event.createdBy = { id: event.userId, name: event.userName }
+  event.image = !!event.image ? getImageURL(event.image, ImageType.events) : ""
   delete event.userId
   delete event.userName
+  delete event.location
   return event
 }
