@@ -1,7 +1,8 @@
 import { db } from "../utilities/db"
 import { Response } from "express"
 import * as uuid from "uuid"
-import { ICreateEventRequest } from "./event.schemas"
+import { ICreateEventRequest, ISearchEventRequest } from "./event.schemas"
+import { formatEventData } from "../utilities/event.utilities"
 
 /**
  * Get details of the event with id sent in the params.
@@ -32,10 +33,11 @@ export function getEventDetails(req: any, res: Response) {
 /**
  * Search Events happening around a location within a particular radius.
  */
-export function searchEvents(req: any, res: Response) {
-  const { latitude, longitude, radius } = req.query
+export function searchEvents(req: ISearchEventRequest, res: Response) {
+  const { latitude, longitude } = req.query
+  const radius = 50
 
-  const query = `select e.id, e.title, e.description, e.location, e.address, e.date, e.duration,
+  const query = `select e.id, e.image, e.title, e.description, e.location, e.address, e.date, e.duration,
   e.user_id as "userId", u.name as "userName"
   from events as e
   left join users u on e.user_id = u.uid 
@@ -44,9 +46,15 @@ export function searchEvents(req: any, res: Response) {
 
   db.manyOrNone(query, values)
     .then((events) => {
-      res.status(200).json({ data: events })
+      events = events.map(event => formatEventData(event))
+      res.status(200).json({ data: { events } })
     }, (err) => {
-      res.status(400).json({ data: err })
+      res.status(400).json({
+        error: {
+          description: "Error while searching events.",
+          details: [{ path: "postgres", message: err.message }]
+        }
+      })
     })
 }
 
