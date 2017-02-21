@@ -1,5 +1,7 @@
+import "reflect-metadata"
+import { inject, injectable } from "inversify"
 import * as pgp from "pg-promise"
-import { db } from "../utilities/db"
+import { CUSTOM_TYPES } from "../dependency-constants"
 
 export interface IUser {
   uid: string
@@ -7,15 +9,13 @@ export interface IUser {
   image?: string
 }
 
-export class UserModel {
 
-  pdb: pgp.IDatabase<any>
+@injectable()
+export class UserRepository {
 
-  constructor(pdb: pgp.IDatabase<any>) {
-    this.pdb = pdb
-  }
+  constructor( @inject(CUSTOM_TYPES.PDB) private pdb: pgp.IDatabase<any>) { }
 
-  create(user: IUser) {
+  add(user: IUser) {
     const query = `insert into users(uid, name, image) values ($1, $2, $3)`
     return this.pdb.none(query, [user.uid, user.name, user.image])
   }
@@ -25,18 +25,11 @@ export class UserModel {
     return this.pdb.oneOrNone(query, [uid])
   }
 
-  updateDetails(uid: string, details: any) {
+  update(uid: string, details: any) {
     const keys = Object.keys(details)
     const setKeys = keys.map((key, index) => key + " = " + "$" + (index + 1)).join(", ")
     const updateQuery = "update users set " + setKeys + " where uid = $" + (keys.length + 1)
     const values = keys.map((key) => details[key])
     return this.pdb.none(updateQuery, [...values, uid])
   }
-
-  deleteWithId(uid: string) {
-    const query = `delete from users where uid = $1`
-    return this.pdb.none(query, [uid])
-  }
 }
-
-export const user = new UserModel(db)
