@@ -8,7 +8,8 @@
     "sourceRoot": "src",
     "outDir": "build",
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "noUnusedLocals": true
   },
   "include": [
     "src"
