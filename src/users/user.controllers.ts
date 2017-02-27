@@ -4,10 +4,15 @@ import { inject, injectable } from "inversify"
 import { Controller, Get, Patch, Post } from "inversify-express-utils"
 import { CUSTOM_TYPES } from "../dependency-constants"
 import { IAuthenticatedRequest } from "../middleware/firebase-auth.middleware"
-import { NotFoundError } from "../utilities/errors/not-found.error"
+import { validate } from "../middleware/schema-validation.middleware"
 import { NotImplementedError } from "../utilities/errors/not-implemented.error"
 import { UserRepository } from "./user.repository"
-import { ICreateUserRequest, IGetUserDetailsRequest, IPatchUserDetailsRequest } from "./user.schemas"
+import {
+  ICreateUserRequest,
+  IGetUserDetailsRequest,
+  IPatchUserDetailsRequest,
+  patchUserDetailSchema
+} from "./user.schemas"
 
 @Controller("/users")
 @injectable()
@@ -40,24 +45,20 @@ export class UserControllers {
    * @param req
    * @param res
    */
-  @Patch("/")
+  @Patch("/", validate(patchUserDetailSchema))
   async patchUserDetails(req: IPatchUserDetailsRequest, res: Response) {
     const { uid } = req.user
-    const { name } = req.body
+    const { key, value } = req.body
 
-    let updatePromise: Promise<any> | undefined
-
-    if (name) {
-      updatePromise = this.userRepository.update(uid, { name })
-    } else if (req.file) {
-      updatePromise = this.userRepository.update(uid, { image: req.file.filename })
+    if (key === "name" && value) {
+      await this.userRepository.update(uid, { name: value })
+    } else if (key === "image" && req.file) {
+      await this.userRepository.update(uid, { image: req.file.filename })
     } else {
-      return { data: { message: "No data to update" } }
+      return res.status(400).json({ error: { message: "No data to update." } })
     }
 
-    await updatePromise
-
-    return { data: { message: "Updated." } }
+    return { data: { message: "Updated" } }
   }
 
   @Get("/")
@@ -77,7 +78,7 @@ export class UserControllers {
     const user = await this.userRepository.getWithId(req.params.id)
 
     if (!user) {
-      throw new NotFoundError(`User with ID:${req.params.id} does not exist.`)
+      return res.status(404).json({ error: { message: `User with ID:${req.params.id} does not exist.` } })
     }
 
     return { data: { user } }

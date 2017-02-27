@@ -9,6 +9,9 @@ export interface IUser {
   image?: string
 }
 
+interface IStringDictionary {
+  [key: string]: string
+}
 
 @injectable()
 export class UserRepository {
@@ -25,7 +28,7 @@ export class UserRepository {
     return this.pdb.oneOrNone(query, [uid])
   }
 
-  update(uid: string, details: any) {
+  update(uid: string, details: IStringDictionary) {
     const keys = Object.keys(details)
     const setKeys = keys.map((key, index) => key + " = " + "$" + (index + 1)).join(", ")
     const updateQuery = "update users set " + setKeys + " where uid = $" + (keys.length + 1)
