@@ -1,29 +1,12 @@
 import { firebaseAdmin } from "../firebase-admin"
-import { Request, Response } from "express"
-
-export interface IFirebaseUser {
-  uid: string
-  email: string
-  emailVerified: boolean
-  name?: string
-  photoURL?: string
-  disabled: boolean
-  providerData: IUserInfo[]
-}
-
-interface IUserInfo {
-  uid: string
-  email: string
-  displayName?: string
-  photoURL?: string
-  providerId: string
-}
+import { NextFunction, Request, Response } from "express"
+import { auth } from "firebase-admin"
 
 export interface IAuthenticatedRequest extends Request {
-  user: IFirebaseUser
+  user: auth.UserRecord
 }
 
-export function firebaseAuthMiddleware(req: Request, res: Response, next: any) {
+export function firebaseAuthMiddleware(req: Request, res: Response, next: NextFunction) {
   const authorizationToken = req.get("Authorization")
 
   if (!authorizationToken) {

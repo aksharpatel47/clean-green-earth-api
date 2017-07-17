@@ -1,30 +1,19 @@
-import * as express from "express"
-import * as morgan from "morgan"
 import * as bodyParser from "body-parser"
-import * as path from "path"
+import { InversifyExpressServer } from "inversify-express-utils"
+import * as morgan from "morgan"
+import { container } from "./container"
 import { firebaseAuthMiddleware } from "./middleware/firebase-auth.middleware"
 
-/**
- * Import Routes
- */
-import { eventRoutes } from "./events/event.routes"
-import { userRoutes } from "./users/user.routes"
-
-/**
- * Initialize Express App
- */
-export const app = express()
+const server = new InversifyExpressServer(container, undefined, { rootPath: "/v1" })
 
 /**
  * Import Middlewares
  */
-app.use(morgan("dev"))
-app.use("/static/images", express.static(path.resolve(__dirname, "../images")))
-app.use(bodyParser.json())
-app.use(firebaseAuthMiddleware)
+server.setConfig((app) => {
+  // TODO: setup appropriate logging
+  app.use(morgan("dev"))
+  app.use(firebaseAuthMiddleware)
+  app.use(bodyParser.json())
+})
 
-/**
- * Register Routes
- */
-app.use("/users", userRoutes)
-app.use("/events", eventRoutes)
+export const app = server.build()

@@ -51,7 +51,6 @@
     "no-internal-module": true,
     "no-trailing-whitespace": true,
     "no-inferrable-types": true,
-    "no-null-keyword": true,
     "prefer-const": true,
     "no-angle-bracket-type-assertion": true,
     "no-default-export": true
