@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "1.17.2",
-    "express": "4.15.3",
+    "express": "4.16.0",
     "firebase-admin": "5.0.1",
     "inversify": "4.2.0",
     "inversify-express-utils": "4.0.0",
